@@ -221,7 +221,8 @@ private:
   TH1D *EventInfo, *ScaleWeights, *PDFWeights, *PSWeights;
   // Scale factor evaluators
   BTagWeightEvaluator SF_deepCSV_;
-  ScaleFactorEvaluator SF_muon_, SF_elec_;
+  ScaleFactorEvaluator SF_muon_, SF_muonTrg_,
+                       SF_elec_, SF_elecTrg_;
  
   int b_eeprefire;
 };
