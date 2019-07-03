@@ -36,10 +36,6 @@
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-// Kinematic Reconstruction
-#include "CATTools/CatAnalyzer/interface/LepJetsFitter.h"
-#include "CATTools/CatAnalyzer/interface/LepJetsFitterFCNH.h"
-
 #include "TH1.h"
 #include "TTree.h"
 #include "TLorentzVector.h"
@@ -351,7 +347,7 @@ ttbbLepJetsAnalyzer::ttbbLepJetsAnalyzer(const edm::ParameterSet& iConfig):
   tree->Branch("eeprefire",  &b_eeprefire, "eeprefire/I");
 
   tree->Branch("PUWeight",      "std::vector<float>", &b_PUWeight);
-  tree->Branch("prefireweight", "std::vector<float>", &b_PrefireWeight);
+  tree->Branch("prefireweight", "std::vector<double>", &b_PrefireWeight);
   tree->Branch("pdfweight",     "std::vector<float>", &b_PDFWeight);
   tree->Branch("scaleweight",   "std::vector<float>", &b_ScaleWeight);
   tree->Branch("psweight",      "std::vector<float>", &b_PSWeight);
@@ -1274,7 +1270,7 @@ bool ttbbLepJetsAnalyzer::IsSelectMuon(const cat::Muon & i_muon_candidate)
   GoodMuon &= (i_muon_candidate.isTightMuon());
 
   GoodMuon &= (i_muon_candidate.isPFMuon());           // PF
-  GoodMuon &= (i_muon_candidate.pt()> 20);             // pT
+  GoodMuon &= (i_muon_candidate.pt()> 30);             // pT
   GoodMuon &= (std::abs(i_muon_candidate.eta())< 2.1); // eta
 
   //----------------------------------------------------------------------------------------------------
@@ -1322,15 +1318,15 @@ bool ttbbLepJetsAnalyzer::IsSelectElectron(const cat::Electron & i_electron_cand
   bool GoodElectron=true;
 
   GoodElectron &= (i_electron_candidate.isPF() );                // PF
-  GoodElectron &= (i_electron_candidate.pt() > 20);              // pT
+  GoodElectron &= (i_electron_candidate.pt() > 30);              // pT
   GoodElectron &= (std::abs(i_electron_candidate.eta()) < 2.1);  // eta
   GoodElectron &= (std::abs(i_electron_candidate.scEta()) < 1.4442 || // eta Super-Cluster
                    std::abs(i_electron_candidate.scEta()) > 1.566);
 
   // Electron cut based selection
   // From https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
-  if ( !doLooseLepton_ ) GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Summer16-80X-V1-medium") > 0.0;
-  else                   GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Summer16-80X-V1-medium-noiso") > 0.0;
+  if ( !doLooseLepton_ ) GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Fall17-94X-V2-tight") > 0.0;
+  else                   GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Fall17-94X-V2-tight-noiso") > 0.0;
 
   // Electron MVA selection (Tight: WP80)
   // From https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#Recipes_for_7_4_12_Spring15_MVA
@@ -1371,7 +1367,7 @@ bool ttbbLepJetsAnalyzer::IsVetoElectron(const cat::Electron & i_electron_candid
                    std::abs(i_electron_candidate.scEta()) > 1.566);
 
   // From https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2
-  GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Summer16-80X-V1-veto") > 0;
+  GoodElectron &= i_electron_candidate.electronID("cutBasedElectronID-Fall17-94X-V2-veto") > 0;
 
   //----------------------------------------------------------------------------------------------------
   //------------- The Relative Isolation is already calculated in the CAT object -----------------------
